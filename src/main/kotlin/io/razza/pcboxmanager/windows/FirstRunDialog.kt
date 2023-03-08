@@ -6,6 +6,7 @@ import org.apache.commons.lang3.SystemUtils
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
@@ -26,8 +27,8 @@ class FirstRunDialog(val parentWindow: Window? = null) : JDialog(parentWindow) {
         add(JLabel().apply {
             size = Dimension(150, 350)
             background = Color(0x000080)
-//            icon =
-//                ImageIcon(ImageIO.read(javaClass.classLoader.getResourceAsStream("resources/io/razza/pcboxmanager/wizards/initial-setup.png")))
+            icon =
+                ImageIcon(ImageIO.read(ClassLoader.getSystemResourceAsStream("io/razza/pcboxmanager/wizards/initial-setup.png")))
         }, BorderLayout.WEST)
 
         add(JPanel(BorderLayout()).apply {
