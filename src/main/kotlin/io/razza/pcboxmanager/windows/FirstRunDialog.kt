@@ -2,11 +2,11 @@ package io.razza.pcboxmanager.windows
 
 import io.razza.pcboxmanager.Config
 import io.razza.pcboxmanager.EightySixBox
+import io.razza.pcboxmanager.views.WizardHero
 import org.apache.commons.lang3.SystemUtils
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
@@ -24,13 +24,7 @@ class FirstRunDialog(val parentWindow: Window? = null) : JDialog(parentWindow) {
 
         layout = BorderLayout()
 
-        add(JLabel().apply {
-            size = Dimension(150, 350)
-            background = Color(0x000080)
-            icon =
-                ImageIcon(ImageIO.read(ClassLoader.getSystemResourceAsStream("io/razza/pcboxmanager/wizards/initial-setup.png")))
-        }, BorderLayout.WEST)
-
+        add(WizardHero("initial-setup"), BorderLayout.WEST)
         add(JPanel(BorderLayout()).apply {
             add(JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)

@@ -2,6 +2,7 @@ package io.razza.pcboxmanager.boxes
 
 import com.google.gson.Gson
 import java.io.File
+import kotlin.io.path.deleteIfExists
 
 /**
  * Data written to and read from a Box lock file.
@@ -21,13 +22,14 @@ data class BoxLock(
      * The reason for the lock.
      */
     val reason: BoxLockReason
-) {
+) : AutoCloseable {
     /**
      * Save the lock into a lock file.
      */
-    fun save(path: File): Unit =
+    fun save(path: File): BoxLock =
         path.writer(Charsets.UTF_8).use { writer ->
             Gson().toJson(this, writer)
+            return@save this
         }
 
     /**
@@ -37,6 +39,14 @@ data class BoxLock(
         if (ProcessHandle.of(pid).isPresent) {
             throw BoxLockedException(this)
         }
+        close() // delete the file it the process doesn't exist
+    }
+
+    /**
+     * Release the lock on the box.
+     */
+    override fun close() {
+        box.lockPath.deleteIfExists()
     }
 
     companion object {

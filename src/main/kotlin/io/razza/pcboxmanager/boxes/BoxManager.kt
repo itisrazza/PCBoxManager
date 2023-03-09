@@ -8,7 +8,7 @@ import java.util.*
 import kotlin.io.path.exists
 
 class BoxManager {
-    private val knownBoxesField = LinkedList<Box>()
+    private val knownBoxesField = ArrayList<Box>()
     private val runningBoxesField = HashSet<Box>()
     private val gson = Gson()
 
@@ -24,19 +24,35 @@ class BoxManager {
 
         val process = EightySixBox()
             .withVmName(box.name)
-            .withVmPath(box.path.toString())
+            .withVmPath(box.path)
             .withConfig(box.configPath.toString())
             .start()
-        BoxLock(box, process.pid(), BoxLockReason.RUNNING).save(box.lockPath.toFile())
+        val lock = BoxLock(box, process.pid(), BoxLockReason.RUNNING).save(box.lockPath.toFile())
 
-        runningBoxes.add(box)
+        process.onExit().whenComplete { _, _ -> lock.close() }
+        runningBoxesField.add(box)
+    }
+
+    fun configure(box: Box) {
+        box.lock()?.throwIfSet()
+
+        val process = EightySixBox()
+            .withVmName(box.name)
+            .withVmPath(box.path)
+            .withConfig(box.configPath.toString())
+            .withSettingsOnly()
+            .start()
+        val lock = BoxLock(box, process.pid(), BoxLockReason.CONFIGURE).save(box.lockPath.toFile())
+
+        process.onExit().whenComplete { _, _ -> lock.close() }
     }
 
     /**
      * Add a box to the library.
      */
     fun add(box: Box) {
-        TODO()
+        knownBoxesField.add(box)
+        save()
     }
 
     /**

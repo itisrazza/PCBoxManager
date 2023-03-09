@@ -15,7 +15,10 @@ object Application {
         window = ApplicationWindow().apply {
             isVisible = true
         }
-        FirstRunDialog(window).isVisible = true
+
+        if (!Config.exists()) {
+            FirstRunDialog(window).isVisible = true
+        }
     }
 }
 

@@ -1,63 +1,58 @@
 package io.razza.pcboxmanager
 
-import java.io.BufferedReader
-import java.io.IOError
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
 
 /**
  * Class to build 86Box command-line arguments.
  */
-class EightySixBox {
-    val program: String
-    val arguments: List<String>
-
-    constructor() {
-        this.program = "86Box"
-        this.arguments = listOf()
-    }
-
-    constructor(program: String, arguments: List<String> = listOf()) {
-        this.program = program
-        this.arguments = arguments
-    }
-
+class EightySixBox(
+    val program: String = "86Box",
+    val arguments: List<String> = listOf(),
+    val workingDirectory: File? = null
+) {
     /**
      * Sets the configuration file 86box uses.
      */
-    fun withConfig(path: String) = EightySixBox(program, arguments + "--config" + path)
+    fun withConfig(path: String) = appendArguments("--config", path)
 
     /**
      * Starts 86box in full screen mode.
      */
-    fun withFullscreen() = EightySixBox(program, arguments + "--fullscreen")
+    fun withFullscreen() = appendArguments("--fullscreen")
 
     /**
      * Mounts a floppy disk image on a drive letter.
      */
-    fun withImage(driveLetter: Char, path: String) = EightySixBox(program, arguments + "--image" + "$driveLetter:$path")
+    fun withImage(driveLetter: Char, path: String) = EightySixBox(
+        program,
+        arguments + "--image" + "$driveLetter:$path",
+        workingDirectory
+    )
 
     /**
      * Sets the log file 86box writes into.
      */
-    fun withLogFile(path: String) = EightySixBox(program, arguments + "--logfile" + path)
+    fun withLogFile(path: String) = appendArguments("--logfile", path)
 
-    fun withNoConfirm() = EightySixBox(program, arguments + "--noconfirm")
+    fun withNoConfirm() = appendArguments("--noconfirm")
 
-    fun withDumpConfig() = EightySixBox(program, arguments + "--dumpcfg")
+    fun withDumpConfig() = appendArguments("--dumpcfg")
 
-    fun withVmPath(path: String) = EightySixBox(program, arguments + "--vmpath" + path)
+    fun withVmPath(path: String) = appendArguments("--vmpath", path)
+        .setWorkingDirectory(File(path))
 
-    fun withRomPath(path: String) = EightySixBox(program, arguments + "--rompath" + path)
+    fun withRomPath(path: String) = appendArguments("--rompath", path)
 
-    fun withSettingsOnly() = EightySixBox(program, arguments + "--settings")
+    fun withSettingsOnly() = appendArguments("--settings")
 
-    fun withVmName(name: String) = EightySixBox(program, arguments + "--vmname" + name)
+    fun withVmName(name: String) = appendArguments("--vmname", name)
 
     /**
      * Starts 86box.
      */
-    fun start() = ProcessBuilder(program, *arguments.toTypedArray()).start()!!
+    fun start() = ProcessBuilder(program, *arguments.toTypedArray())
+        .directory(workingDirectory)
+        .start()!!
 
     /**
      * Checks if the given path is something resembling 86box
@@ -81,4 +76,12 @@ class EightySixBox {
 
         return stdout.contains("usage: 86box [options]")
     }
+
+    private fun appendArguments(vararg arguments: String) = EightySixBox(
+        program,
+        this.arguments.plus(arguments),
+        workingDirectory
+    )
+
+    private fun setWorkingDirectory(directory: File) = EightySixBox(program, arguments, directory)
 }

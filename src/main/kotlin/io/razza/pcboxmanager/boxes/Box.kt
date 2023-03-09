@@ -8,11 +8,13 @@ import kotlin.io.path.exists
 /**
  * Represents a box (our terminology for a Virtual Machine) and provides helpers for configuration paths.
  */
-class Box(val name: String, val path: Path) {
-    @Transient val configPath = path.resolve("config.json")
-    @Transient val lockPath = path.resolve("lock.json")
+class Box(val name: String, val path: String) {
+    val configPath: Path get() = Paths.get(path).resolve("config.json")
+    val lockPath: Path get() = Paths.get(path).resolve("lock.json")
 
     fun lock(): BoxLock? =
         if (!lockPath.exists()) null
         else BoxLock.load(lockPath.toFile())
+
+    override fun toString() = "Box(name = '$name', path = '$path')"
 }
