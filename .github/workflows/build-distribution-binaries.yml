@@ -34,5 +34,6 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v3.1.2
       with:
-        path: build/distributions
+        name: Cross-Platform Java Bytecode
+        path: build/distributions/*
     
